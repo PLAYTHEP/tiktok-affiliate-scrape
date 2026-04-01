@@ -1,0 +1,29 @@
+name: TikTok Affiliate Pipeline
+
+on:
+  schedule:
+    # รันทุก 12 ชั่วโมง (00:00 และ 12:00 UTC)
+    - cron: "0 0,12 * * *"
+  workflow_dispatch: # รัน manual ได้ด้วย
+
+jobs:
+  scrape-and-send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Run TikTok Scraper
+        env:
+          GAS_WEBHOOK_URL: ${{ secrets.GAS_WEBHOOK_URL }}
+        run: python scraper/tiktok_scraper.py
